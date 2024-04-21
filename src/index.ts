@@ -1,11 +1,11 @@
-const { ChatBot, rl } = require('./ChatBot');
-const chatBot = new ChatBot();
+import { ChatBot, rl } from "./ChatBot";
+const chatBot: ChatBot = new ChatBot();
 
 rl.prompt();
 
 rl.on('line', chatBot.executeCommand);
 
-const exitHandler = () => {
+const exitHandler = (): void => {
   rl.close();
   process.stdout.write('\nExit successful, have a great day! ');
   process.exit(0);
@@ -13,7 +13,7 @@ const exitHandler = () => {
 
 process.on('SIGINT', exitHandler);
 
-rl.on('close', () => {
+rl.on('close', (): void => {
   process.stdout.write('\nExit successful, have a great day! ');
   process.exit(0);
 });

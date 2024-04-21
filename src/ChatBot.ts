@@ -1,7 +1,7 @@
-const readline = require('node:readline/promises');
-const { Greet, Help, Weather, Hello, Exit } = require('./classes/classes')
+import * as readline from 'node:readline/promises';
+import { Greet, Help, Weather, Hello, Exit } from './classes/classes';
 
-export const rl = readline.createInterface({
+export const rl: readline.Interface = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   prompt: `
@@ -17,24 +17,24 @@ You can run the following commands:
 
 export class ChatBot {
   executeCommand(command: string): void {
-    const trimmedCommand = command.trim();
-    const [action, ...args] = trimmedCommand.split(' ');
+    const trimmedCommand: string = command.trim();
+    const [action, ...args]: string[] = trimmedCommand.split(' ');
   
     switch (action) {
       case 'greet':
         new Greet().execute(args);
         break;
       case 'help':
-  new Help().execute();
+        new Help().execute(action);
         break;
       case 'weather':
         new Weather().execute(args);
         break;
       case 'hello':
-        new Hello().execute();
+        new Hello().execute(action);
         break;
       case 'exit':
-        new Exit().execute();
+        new Exit().execute(action);
         break;
       default:
         console.log(`-> Command not recognized, please type help for more info`);
