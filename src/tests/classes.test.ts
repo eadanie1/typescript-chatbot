@@ -1,18 +1,10 @@
 import { ChatBot, rl } from "../ChatBot";
 import { Exit, Greet, Hello, Help, Weather } from "../classes/classes";
 
+
+// Unit testing of each command method
+
 describe('Greet.execute', (): void => {
-  it('should return a default error message to please input a name', (): void => {
-    const args: string[] = [];
-    const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
-
-    new Greet().execute(args);
-
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/personalized/));
-    
-    consoleSpy.mockRestore();
-  });
-  
   it('should return a greeting message with the passed name', (): void => {
     const args: string[] = ['daniel'];
     const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
@@ -23,6 +15,17 @@ describe('Greet.execute', (): void => {
     
     consoleSpy.mockRestore();
   });
+
+  it('should return an error message if the name is missing in the input', (): void => {
+    const args: string[] = [];
+    const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
+
+    new Greet().execute(args);
+
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/personalized/));
+    
+    consoleSpy.mockRestore();
+  });
 });
 
 describe('Help.execute', (): void => {
@@ -30,17 +33,25 @@ describe('Help.execute', (): void => {
     const action: string = 'help';
     const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
     
-    if (action === 'help') {
-      new Help().execute(action);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/<location>/));
-    } else {
-      expect(consoleSpy).not.toHaveBeenCalled();
-    }
+    new Help().execute(action);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/<location>/));
+
     consoleSpy.mockRestore();
   });
 });
 
 describe('Weather.execute', (): void => {
+  it('should return a weather forecast message to input weather + <location>', (): void => {
+    const args: string[] = ['Stockholm'];
+    const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
+
+    new Weather().execute(args);
+    
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/Stockholm/));
+    
+    consoleSpy.mockRestore();
+  });
+
   it('should return an error message if the location is missing in the input', (): void => {
     const args: string[] = [];
     const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
@@ -48,17 +59,6 @@ describe('Weather.execute', (): void => {
     new Weather().execute(args);
     
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/specify/));
-    
-    consoleSpy.mockRestore();
-  });
-  
-  it('should return a weather forecast message to input weather + <location>', (): void => {
-    const args: string[] = ['stockholm'];
-    const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
-
-    new Weather().execute(args);
-    
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/stockholm/));
     
     consoleSpy.mockRestore();
   });
@@ -74,55 +74,75 @@ describe('Hello.execute', (): void => {
 
     consoleSpy.mockRestore();
   });
+});
 
-  it('should not execute anything if input is not hello', (): void => {
-    const action: string = 'not_hello';
+describe('Exit.execute', (): void => {
+  it('should exit successfully and return exit message to input exit', (): void => {
+    const action: string = 'exit';
+    const rlCloseSpy: jest.SpyInstance = jest.spyOn(rl, 'close').mockImplementation((): void => {});
+    
+    new Exit().execute(action);
+    expect(rlCloseSpy).toHaveBeenCalled();
+    
+    rlCloseSpy.mockRestore();
+  });
+  
+  it('should not execute anything if input is not exit', (): void => {
+    const action: string = 'not_exit';
+    const rlCloseSpy: jest.SpyInstance = jest.spyOn(rl, 'close').mockImplementation((): void => {});
+    
+    new ChatBot().executeCommand(action);
+    expect(rlCloseSpy).not.toHaveBeenCalled();
+    
+    rlCloseSpy.mockRestore();
+  });
+});
+
+// Unit testing for routing of switch/case function
+
+describe('ChatBot-routing', (): void => {
+  it('should delegate each call to the correct method', (): void => {
+    const action: string = 'hello';
     const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
-    const executeCommandSpy = jest.spyOn(ChatBot.prototype, 'executeCommand');
+    const executeCommandSpy: jest.SpyInstance = jest.spyOn(ChatBot.prototype, 'executeCommand');
 
     new ChatBot().executeCommand(action);
 
-    expect(executeCommandSpy).toHaveBeenCalledWith(action);
-    expect(consoleSpy).not.toHaveBeenCalled();
+    expect(executeCommandSpy).toHaveBeenCalledWith(expect.stringMatching(new RegExp(action, 'i')));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(new RegExp(action, 'i')));
     
     executeCommandSpy.mockRestore();
     consoleSpy.mockRestore();
   });
 });
 
-describe('Exit.execute', (): void => {
-  it('should exit successfully and return exit message to input exit', (): void => {
-    const action: string = 'exit';
-    const rlCloseSpy = jest.spyOn(rl, 'close').mockImplementation(() => {});
-    
-    new Exit().execute(action);
-    expect(rlCloseSpy).toHaveBeenCalled();
+// Unit testing for unknown / malformed commands
 
-    rlCloseSpy.mockRestore();
-  });
-
-  // it('should not execute anything if input is not exit', (): void => {
-  //   const action: string = 'not_exit';
-  //   const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
-  //   const executeCommandSpy = jest.spyOn(ChatBot.prototype, 'executeCommand');
-
-  //   new ChatBot().executeCommand(action);
-
-  //   expect(executeCommandSpy).toHaveBeenCalledWith(action);
-  //   expect(consoleSpy).not.toHaveBeenCalled();
-    
-  //   executeCommandSpy.mockRestore();
-  //   consoleSpy.mockRestore();
-  // });
-});
-
-describe('default', () => {
-  it('should handle unrecognized commands', () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+describe('default-case', (): void => {
+  it('should handle unrecognized commands', (): void => {
+    const consoleErrorSpy: jest.SpyInstance = jest.spyOn(console, 'error').mockImplementation((): void => {});
     new ChatBot().executeCommand('unknownd-command');
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringMatching(/not recognized/));
 
     consoleErrorSpy.mockRestore();
+  });
+});
+
+// Unit testing for empty command
+
+describe('ChatBot-empty-input', (): void => {
+  it('should not place any call upon empty input', (): void => {
+    const action: string = '';
+    const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
+    const executeCommandSpy: jest.SpyInstance = jest.spyOn(ChatBot.prototype, 'executeCommand');
+    
+    new ChatBot().executeCommand(action);
+    
+    expect(executeCommandSpy).toHaveBeenCalledWith('');
+    expect(consoleSpy).not.toHaveBeenCalled();
+    
+    executeCommandSpy.mockRestore();
+    consoleSpy.mockRestore();
   });
 });

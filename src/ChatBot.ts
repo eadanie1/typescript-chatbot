@@ -17,9 +17,14 @@ You can run the following commands:
 
 export class ChatBot {
   executeCommand(command: string): void {
+    if (!command) {
+      console.error('-> No command entered, please provide a command and press Enter');
+      rl.prompt();
+      return;
+    }
     const trimmedCommand: string = command.trim();
     const [action, ...args]: string[] = trimmedCommand.split(' ');
-  
+    
     switch (action) {
       case 'greet':
         new Greet().execute(args);
