@@ -37,7 +37,7 @@ export class ChatBot {
         new Exit().execute(action);
         break;
       default:
-        console.log(`-> Command not recognized, please type help for more info`);
+        console.error(`-> Command not recognized, please type help for more info`);
         break;
       }
       rl.prompt();

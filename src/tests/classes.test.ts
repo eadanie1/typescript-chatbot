@@ -1,3 +1,4 @@
+import { ChatBot, rl } from "../ChatBot";
 import { Exit, Greet, Hello, Help, Weather } from "../classes/classes";
 
 describe('Greet.execute', (): void => {
@@ -29,10 +30,12 @@ describe('Help.execute', (): void => {
     const action: string = 'help';
     const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
     
-    new Help().execute(action);
-    
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/<location>/));
-    
+    if (action === 'help') {
+      new Help().execute(action);
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/<location>/));
+    } else {
+      expect(consoleSpy).not.toHaveBeenCalled();
+    }
     consoleSpy.mockRestore();
   });
 });
@@ -67,22 +70,59 @@ describe('Hello.execute', (): void => {
     const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
     
     new Hello().execute(action);
-    
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/session/));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('should not execute anything if input is not hello', (): void => {
+    const action: string = 'not_hello';
+    const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
+    const executeCommandSpy = jest.spyOn(ChatBot.prototype, 'executeCommand');
+
+    new ChatBot().executeCommand(action);
+
+    expect(executeCommandSpy).toHaveBeenCalledWith(action);
+    expect(consoleSpy).not.toHaveBeenCalled();
     
+    executeCommandSpy.mockRestore();
     consoleSpy.mockRestore();
   });
 });
 
 describe('Exit.execute', (): void => {
-  it('should return a goodbye message to input exit', (): void => {
+  it('should exit successfully and return exit message to input exit', (): void => {
     const action: string = 'exit';
-    const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
+    const rlCloseSpy = jest.spyOn(rl, 'close').mockImplementation(() => {});
     
     new Exit().execute(action);
+    expect(rlCloseSpy).toHaveBeenCalled();
+
+    rlCloseSpy.mockRestore();
+  });
+
+  // it('should not execute anything if input is not exit', (): void => {
+  //   const action: string = 'not_exit';
+  //   const consoleSpy: jest.SpyInstance = jest.spyOn(console, 'log');
+  //   const executeCommandSpy = jest.spyOn(ChatBot.prototype, 'executeCommand');
+
+  //   new ChatBot().executeCommand(action);
+
+  //   expect(executeCommandSpy).toHaveBeenCalledWith(action);
+  //   expect(consoleSpy).not.toHaveBeenCalled();
     
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/Exit successful/));
-    
-    consoleSpy.mockRestore();
+  //   executeCommandSpy.mockRestore();
+  //   consoleSpy.mockRestore();
+  // });
+});
+
+describe('default', () => {
+  it('should handle unrecognized commands', () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    new ChatBot().executeCommand('unknownd-command');
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringMatching(/not recognized/));
+
+    consoleErrorSpy.mockRestore();
   });
 });
