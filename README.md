@@ -54,6 +54,14 @@ Once the application is running, follow the prompts to interact with the ChatBot
 - `hello`: Greets the bot.
 - `exit`: Closes the ChatBot.
 
+## Testing
+
+This project includes a comprehensive Jest testing suite to ensure the functionality of the ChatBot. You can run the tests using:
+
+```bash
+npm test
+```
+
 ## Contributing
 
 Contributions are welcome! Feel free to submit pull requests or open issues for any improvements, bug fixes, or new features.
