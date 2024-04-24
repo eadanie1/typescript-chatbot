@@ -24,8 +24,6 @@ ChatBot is a simple command-line interface (CLI) application built with Node.js 
 git clone https://github.com/eadanie1/typescript-chatbot.git
 ```
 
-````
-
 2. Navigate to the project directory:
 
 ```bash
@@ -56,14 +54,6 @@ Once the application is running, follow the prompts to interact with the ChatBot
 - `hello`: Greets the bot.
 - `exit`: Closes the ChatBot.
 
-## Testing
-
-This project includes a comprehensive Jest testing suite to ensure the functionality of the ChatBot. You can run the tests using:
-
-```bash
-npm test
-```
-
 ## Contributing
 
 Contributions are welcome! Feel free to submit pull requests or open issues for any improvements, bug fixes, or new features.
@@ -71,4 +61,3 @@ Contributions are welcome! Feel free to submit pull requests or open issues for 
 ## License
 
 This project is licensed under the [MIT License](For more details, see the full license text here: [LICENSE.txt](LICENSE.txt)).
-````
